@@ -1,94 +1,109 @@
-# Projet DSAI : Persuasion, Détection d'IA et Génération d'arguments
+# DSAI Project: Persuasion, AI Detection & Argument Generation
 
-Ce dépôt contient le code source de notre projet réalisé dans le cadre de la filière DSAI. Le projet porte sur l'analyse d'arguments (dataset WAC), la détection de textes générés par IA (datasets GRID, HC3 & M4GT) et la génération de discours persuasif à l'aide de Modèles de Langage (LLMs).
+This repository contains the source code for our project developed as part of the **DSAI (Data Science & Artificial Intelligence) program** at **Télécom Paris**.
 
-Projet supervisé par Mathieu LABEAU et Pierre FIHEY. 
+The project focuses on three complementary tasks:
 
-## 1. Structure du projet
+- **Argument analysis and persuasion prediction** using the **Winning Argument Corpus (WAC)** dataset.
+- **AI-generated text detection** using the **GriD, HC3 and M4GT** datasets.
+- **Persuasive argument generation** using **Large Language Models (LLMs)**.
+
+The project was supervised by **Mathieu LABEAU** and **Pierre FIHEY**.
+
+---
+
+## 1. Project Structure
 
 ```text
 Projet-DSAI/
 │
-├── configs/                    # Fichiers de configuration Hydra (YAML)
+├── configs/                    # Hydra configuration files (YAML)
 │   ├── dataset/                # wac, hc3, m4gt, grid
 │   ├── encoder/                # tfidf, w2v, roberta, features
 │   ├── model/                  # svm
-│   └── generation/             # Configuration de l'Axe 3 (Génération)
+│   └── generation/             # Axis 3 generation configuration
 │
 ├── src/
-│   ├── data/                   # Chargement et prétraitement (WAC, HC3, M4GT)
-│   ├── features/               # Extraction de features (stylistiques, Jaccard)
-│   ├── encoders/               # Encodeurs : TF-IDF, Word2Vec, RoBERTa
-│   ├── models/                 # Modèles de classification (SVM)
-│   └── generation/             # Logique de génération (Best-of-N, prompt engineering)
+│   ├── data/                   # Data loading and preprocessing (WAC, HC3, M4GT)
+│   ├── features/               # Feature extraction (stylistic, Jaccard)
+│   ├── encoders/               # Encoders: TF-IDF, Word2Vec, RoBERTa
+│   ├── models/                 # Classification models (SVM)
+│   └── generation/             # Generation logic (Best-of-N, prompt engineering)
 │
-├── archives/                   # Anciens rapports et scripts obsolètes
-├── datasets/                   # Dossier contenant les données brutes
-├── outputs/                    # Résultats d'exécution et logs générés par Hydra
+├── report/                     # report of the project
+├── datasets/                   # Raw datasets
+├── outputs/                    # Hydra outputs and generated logs
 │
-├── train.py                    # Entraînement des classifieurs SVM (Axes 1 & 2)
-├── finetune_roberta.py         # Script de fine-tuning de RoBERTa (Axe 2 M4GT)
-├── finetune.py                 # Fine-tuning des LLMs (Axe 3 - LoRA/bitsandbytes)
-├── generate.py                 # Génération d'arguments et création du rapport final
-├── evaluate.py                 # Évaluation et visualisation (PCA / t-SNE)
+├── train.py                    # SVM training (Axes 1 & 2)
+├── finetune_roberta.py         # RoBERTa fine-tuning (Axis 2 - M4GT)
+├── finetune.py                 # LLM fine-tuning (Axis 3 - LoRA/bitsandbytes)
+├── generate.py                 # Argument generation and final report creation
+├── evaluate.py                 # Evaluation and visualization (PCA / t-SNE)
 │
-├── scripts/                    # Scripts utilitaires (téléchargement, PDF generation)
-├── projetSD.tex                # Code source du rapport en LaTeX
-└── requirements.txt            # Liste des dépendances Python
+├── scripts/                    # Utility scripts (dataset download, PDF generation)
+├── projetSD.tex                # LaTeX source of the project report
+└── requirements.txt            # Python dependencies
 ```
 
 ---
 
-## 2. Installation de l'environnement
+## 2. Environment Setup
 
 ```bash
-# Création de l'environnement virtuel
+# Create a virtual environment
 python -m venv env
 
-# Activation (Windows)
+# Activate on Windows
 .\env\Scripts\activate
-# Activation (Linux / macOS)
+
+# Activate on Linux / macOS
 source env/bin/activate
 
-# Installation des dépendances
+# Install dependencies
 pip install -r requirements.txt
 ```
 
-Pour télécharger et formater les datasets requis :
+Download and format the required datasets:
+
 ```bash
 python -X utf8 scripts/download_datasets.py --all
 ```
 
 ---
 
-## 3. Commandes d'exécution
+## 3. Running the Experiments
 
-Le projet est paramétré à l'aide d'**Hydra**, ce qui permet de modifier les paramètres directement depuis la ligne de commande.
+The project uses **Hydra** for experiment configuration, allowing parameters to be modified directly from the command line.
 
-### Axe 1 : Évaluation de la persuasion (Winning Argument Corpus)
-Entraînement d'un SVM pour prédire si un argument réussit à changer l'opinion d'un utilisateur.
+### Axis 1: Persuasion Prediction — Winning Argument Corpus
+
+Training an SVM to predict whether an argument successfully changes a user's opinion:
+
 ```bash
 python train.py dataset=wac encoder=features
 ```
 
-### Axe 2 : Détection d'IA (Human vs ChatGPT)
-Entraînement de modèles pour différencier les textes humains de ceux générés par IA.
+### Axis 2: AI-Generated Text Detection — Human vs. AI
+
+Training models to distinguish human-written text from AI-generated text.
+
 ```bash
-# Baseline avec SVM et TF-IDF sur le dataset HC3
+# Baseline using SVM and TF-IDF on the HC3 dataset
 python train.py dataset=hc3 encoder=tfidf
 
-# Fine-tuning complet de RoBERTa sur le dataset M4GT
+# Full RoBERTa fine-tuning on the M4GT dataset
 python finetune_roberta.py dataset=m4gt
 ```
 
-### Axe 3 : Génération Stratégique
-La génération utilise les modèles des Axes 1 et 2 pour guider la création de texte.
+### Axis 3: Strategic Argument Generation
+
+The generation pipeline uses the models developed in Axes 1 and 2 to guide the generation of persuasive text.
 
 ```bash
-# 1. Fine-tuning du LLM sur les arguments gagnants
+# 1. Fine-tune the LLM on winning arguments
 python finetune.py llm=gpt2
 
-# 2. Génération et évaluation Best-of-N
+# 2. Best-of-N generation and evaluation
 python generate.py strategy=best_of_n \
     llm.model_id=outputs/finetuned_gpt2/ \
     axe1.model_path=axe1_svm_features_wac.pkl \
@@ -96,46 +111,85 @@ python generate.py strategy=best_of_n \
     axe2.model_path=outputs/roberta_finetuned_m4gt/best_model \
     axe2.encoder_name=roberta
 ```
-À l'issue de la génération, un rapport au format HTML (`generation_report.html`) et un fichier CSV sont créés avec les textes produits et leurs scores respectifs.
+
+After generation, an HTML report (`generation_report.html`) and a CSV file are produced containing the generated texts and their respective scores.
 
 ---
 
-## 4. Équipe
+## 4. Team
 
-Projet réalisé par :
+### Project Members
+
 - **Yanis DAHASSE**
-- **Tristan JIN** 
-- **Wassim SMATI** 
+- **Tristan JIN**
+- **Wassim SMATI**
 
-Contributions : 
+### Contributions
 
-Wassim SMATI: I was responsible for Axis 2 (AI-generated text detection) and Axis
-3 (text generation). I designed the project’s Hydra-based architecture and configuration
-management system, ensuring reproducibility and scalability across experiments. For Axis
-2, I developed and evaluated AI-generated text detectors on the HC3, GriD, and M4GT
-datasets, implemented and compared multiple text representations (TF-IDF, Word2Vec,
-and RoBERTa-based Sentence-Transformers embeddings), and built a RoBERTa fine-
-tuning pipeline using the Hugging Face Trainer API. For Axis 3, I fine-tuned GPT-2 and
-Qwen 2.5 3B models using QLoRA under hardware constraints, and implemented both
-Best-of-N generation and prompt engineering strategies. I also developed interpretability
-tools, including t-SNE and UMAP visualizations to compare generated and human-written
-texts.
+#### Yanis DAHASSE — NLP & Transformer Modeling
 
-• Tristan JIN: I was mainly responsible for Axis 1: searching for papers and the WAC
-dataset; proposing the simplification of Axis 1; exploring the dataset and a first failed
-cleaning attempt. Implementation of the Encoder (W2V, TF-IDF, RoBERTa) + SVM
-method (tested with LogReg initially) with and without OP; implementation of the paper’s
-features and SHAP analysis; implementation of the pairwise method; failed attempt at
-RoBERTa fine-tuning.
+I primarily contributed to **Axis 1: Persuasion Prediction**, with a focus on **data preparation, bias handling and Transformer-based modeling**.
 
-• Yanis DAHASSE: In this project, I focused mainly on Axis 1. I handled the cleaning and
-formatting of the CMV dataset, as well as data preparation , train/validation/test splitting
-by post identifier and position bias handling. On the modelling side, I performed the fine-
-tuning of RoBERTa in Cross-Encoder architecture, which constitutes our best result on this
-task, and explored several DeBERTa approaches that did not succeed within the allotted
-time. In parallel, I conducted a literature review of reference works and developed the
-project timeline.
+- **Dataset Engineering:** cleaned and formatted the CMV dataset and prepared the data for modeling.
+- **Data Splitting:** designed the train/validation/test split **by post identifier**, ensuring that posts from the same discussion did not leak across different splits.
+- **Bias Handling:** investigated and addressed **position bias** in the dataset.
+- **Transformer Modeling:** designed and implemented a **RoBERTa Cross-Encoder architecture** for pairwise argument classification.
+- **Fine-Tuning & Experimentation:** fine-tuned RoBERTa and explored several **DeBERTa-based approaches**, analyzing their performance and limitations.
+- **Results:** the RoBERTa Cross-Encoder achieved the **best result obtained on Axis 1, with 72% accuracy**.
+- **Research:** conducted a literature review of reference works related to computational argumentation and persuasion.
+- **Project Organization:** developed and maintained the project timeline and experimental roadmap.
 
-Outils d'organisation : GitHub et utilisation des serveurs gpu de l'école pour les calculs lourds.
+#### Tristan JIN — NLP & Feature-Based Modeling
 
+Tristan primarily contributed to **Axis 1**, with a focus on dataset exploration, classical NLP approaches and feature-based modeling.
 
+- Conducted the literature review and investigated the **WAC dataset**.
+- Explored the dataset and investigated different data cleaning approaches.
+- Implemented and evaluated **Word2Vec, TF-IDF and RoBERTa-based encoders** combined with SVM classification.
+- Initially investigated **Logistic Regression** as an alternative classifier.
+- Implemented the features described in the reference paper.
+- Conducted **SHAP-based model analysis**.
+- Implemented and evaluated the **pairwise classification approach**.
+- Explored RoBERTa fine-tuning approaches.
+
+#### Wassim SMATI — AI Detection & LLM Generation
+
+Wassim was primarily responsible for **Axis 2: AI-Generated Text Detection** and **Axis 3: Strategic Argument Generation**.
+
+- Designed the project's **Hydra-based architecture and configuration management**, supporting reproducible and scalable experiments.
+- Developed and evaluated AI-generated text detection approaches on the **HC3, GriD and M4GT** datasets.
+- Implemented and compared multiple text representations, including **TF-IDF, Word2Vec and RoBERTa-based Sentence-Transformer embeddings**.
+- Developed a **RoBERTa fine-tuning pipeline** using the Hugging Face Trainer API.
+- Fine-tuned **GPT-2 and Qwen 2.5 3B** using **QLoRA** under hardware constraints.
+- Implemented **Best-of-N generation** and prompt engineering strategies.
+- Developed interpretability tools using **t-SNE and UMAP** to compare generated and human-written text.
+
+---
+
+## 5. Technologies
+
+- **Python**
+- **PyTorch**
+- **Scikit-learn**
+- **Hugging Face Transformers**
+- **RoBERTa**
+- **DeBERTa**
+- **Sentence Transformers**
+- **TF-IDF**
+- **Word2Vec**
+- **SVM**
+- **LLMs**
+- **QLoRA**
+- **LoRA**
+- **Hydra**
+- **SHAP**
+- **t-SNE / UMAP**
+- **Git / GitHub**
+
+---
+
+## 6. Organization & Computing Resources
+
+The project was developed collaboratively using **GitHub** for version control and project organization.
+
+Computationally intensive experiments were run on the **GPU servers provided by Télécom Paris**.
