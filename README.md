@@ -103,6 +103,7 @@ python generate.py strategy=best_of_n \
 ## 4. Équipe
 
 Projet réalisé par :
+- **Yanis DAHASSE**
 - **Tristan JIN** 
 - **Wassim SMATI** 
 
